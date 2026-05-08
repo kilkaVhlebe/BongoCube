@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "bongocube",
+  "version": "${version}",
+  "name": "BongoCube",
+  "description": "",
+  "authors": [],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "assets/bongocube/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "fabric-datagen": [
+      "org.kilka.bongocube.client.BongocubeDataGenerator"
+    ],
+    "client": [
+      "org.kilka.bongocube.client.BongocubeClient"
+    ],
+    "main": [
+      "org.kilka.bongocube.Bongocube"
+    ],
+    "modmenu": [
+      "org.kilka.bongocube.client.ModMenuIntegration"
+    ]
+  },
+  "mixins": [
+    "bongocube.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
