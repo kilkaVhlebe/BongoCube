@@ -13,6 +13,7 @@ import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.Nullable;
 import org.kilka.bongocube.Bongocube;
 import org.kilka.bongocube.client.data.BongocubeData;
+import org.kilka.bongocube.client.keymapings.KeysMaps;
 import org.kilka.bongocube.client.utils.ChibiRenderer;
 import org.kilka.bongocube.client.utils.ChibiSchema;
 import org.slf4j.Logger;
@@ -31,6 +32,8 @@ public class BongocubeClient implements ClientModInitializer {
         Config.initialize();
         ChibiRenderer.initialize();
 
+        KeysMaps.registerMappings();
+
         Path modDir = FabricLoader.getInstance().getGameDir().resolve(Bongocube.MOD_ID);
         ChibiSchema schema = new ChibiSchema();
         if (schema.load(modDir)) {
@@ -39,7 +42,7 @@ public class BongocubeClient implements ClientModInitializer {
 
         ClientPlayConnectionEvents.JOIN.register((listener, sender, minecraft) -> {
             bongocubeData = BongocubeData.loadOrCreate(
-                    FabricLoader.getInstance().getGameDir().resolve(Bongocube.MOD_ID),
+                    FabricLoader.getInstance().getGameDir().resolve(Bongocube.MOD_ID).resolve("local_data"),
                     getFileName(minecraft)
             );
         });
@@ -47,7 +50,7 @@ public class BongocubeClient implements ClientModInitializer {
         ClientPlayConnectionEvents.DISCONNECT.register((listener, minecraft) -> {
             if (bongocubeData != null) {
                 bongocubeData.save(
-                        FabricLoader.getInstance().getGameDir().resolve(Bongocube.MOD_ID),
+                        FabricLoader.getInstance().getGameDir().resolve(Bongocube.MOD_ID).resolve("local_data"),
                         getFileName(minecraft)
                 );
                 bongocubeData = null;

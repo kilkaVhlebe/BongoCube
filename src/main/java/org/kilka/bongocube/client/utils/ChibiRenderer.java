@@ -12,7 +12,6 @@ import net.minecraft.util.Util;
 import org.kilka.bongocube.Bongocube;
 import org.kilka.bongocube.client.Config;
 import org.kilka.bongocube.client.ModExecutor;
-import org.kilka.bongocube.client.events.ClickEvent;
 import org.kilka.bongocube.client.web.MojangApi;
 import org.kilka.bongocube.client.web.SkinDownloader;
 import org.slf4j.Logger;
@@ -24,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-public class ChibiRenderer implements ClickEvent.TapListener {
+public class ChibiRenderer {
     private static final Logger LOGGER = LoggerFactory.getLogger("Bongocube");
 
     private static final Map<String, ChibiSkin> skinCache = new HashMap<>();
@@ -131,7 +130,7 @@ public class ChibiRenderer implements ClickEvent.TapListener {
 
         boolean useSchema = Config.get().useChibiSchema;
         String suffix = useSchema ? "_chibi" : "_chibi_default";
-        Path chibiPath = skinsDir.resolve(safeName.toLowerCase(java.util.Locale.ROOT) + suffix + ".png");
+        Path chibiPath = skinsDir.resolve(safeName.toLowerCase()).resolve(safeName.toLowerCase(java.util.Locale.ROOT) + suffix + ".png");
 
         final String finalSuffix = suffix;
         final String finalSafeName = safeName.toLowerCase(java.util.Locale.ROOT);
@@ -159,7 +158,7 @@ public class ChibiRenderer implements ClickEvent.TapListener {
                     return;
                 }
 
-                Path originalSkinPath = skinsDir.resolve(finalSafeName + "_original.png");
+                Path originalSkinPath = skinsDir.resolve(safeName.toLowerCase()).resolve(finalSafeName + "_original.png");
                 try { Files.deleteIfExists(originalSkinPath); } catch (Exception ignored) {}
 
                 String skinUrl;
@@ -173,7 +172,8 @@ public class ChibiRenderer implements ClickEvent.TapListener {
                     return;
                 }
 
-                NativeImage skinImage = SkinDownloader.downloadSkin(skinUrl, originalSkinPath);
+                byte[] skinData = SkinDownloader.downloadSkinToByteArray(skinUrl);
+                NativeImage skinImage = SkinChache.SaveSkin(originalSkinPath,skinData);
                 if (skinImage == null) {
                     return;
                 }
@@ -262,8 +262,8 @@ public class ChibiRenderer implements ClickEvent.TapListener {
         }
     }
 
-    @Override
-    public void keyWasTapped() {
+
+    public static void keyWasTapped() {
         clickOffset = 4;
     }
 }

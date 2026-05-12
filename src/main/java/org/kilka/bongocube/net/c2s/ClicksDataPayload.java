@@ -6,7 +6,9 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 import org.kilka.bongocube.Bongocube;
 
-public record ClicksDataPayload(Long clicks, String uuid) implements CustomPacketPayload {
+import java.util.UUID;
+
+public record ClicksDataPayload(Long clicks, UUID uuid) implements CustomPacketPayload {
 
     public static final Type<ClicksDataPayload> TYPE = new Type<>(
             Identifier.fromNamespaceAndPath(Bongocube.MOD_ID, "clicks_data")
@@ -16,9 +18,9 @@ public record ClicksDataPayload(Long clicks, String uuid) implements CustomPacke
             StreamCodec.of(
                     (buf, payload) -> {
                         buf.writeLong(payload.clicks);
-                        buf.writeUtf(payload.uuid);
+                        buf.writeUUID(payload.uuid);
                         },
-                    (buf) -> new ClicksDataPayload(buf.readLong(), buf.readUtf())
+                    (buf) -> new ClicksDataPayload(buf.readLong(), buf.readUUID())
             );
 
     @Override

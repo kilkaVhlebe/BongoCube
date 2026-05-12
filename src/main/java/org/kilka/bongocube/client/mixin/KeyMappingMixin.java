@@ -7,12 +7,13 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import org.kilka.bongocube.client.BongocubeClient;
-import org.kilka.bongocube.client.events.ClickEvent;
 import org.kilka.bongocube.client.utils.ChibiRenderer;
 import org.kilka.bongocube.net.c2s.ClicksDataPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.Mixin;
+
+import static org.kilka.bongocube.Bongocube.playersStatsData;
 
 @Mixin(KeyMapping.class)
 public class KeyMappingMixin {
@@ -21,14 +22,10 @@ public class KeyMappingMixin {
 
     @WrapMethod(method = "set")
     private static void clickCounter(InputConstants.Key key, boolean held, Operation<Void> original) {
-        if ( BongocubeClient.bongocubeData != null && !held) {
+        if ( BongocubeClient.bongocubeData != null && !held && Minecraft.getInstance().player != null) {
             BongocubeClient.bongocubeData.clicks += 1;
-            ClickEvent clickEvent = new ClickEvent();
-            ChibiRenderer responder = new ChibiRenderer();
-            clickEvent.addListener(responder);
-            clickEvent.tap();
-
-            ClientPlayNetworking.send(new ClicksDataPayload(BongocubeClient.bongocubeData.clicks, Minecraft.getInstance().player.getStringUUID()));
+            ChibiRenderer.keyWasTapped();
+            ClientPlayNetworking.send(new ClicksDataPayload(BongocubeClient.bongocubeData.clicks, Minecraft.getInstance().player.getUUID()));
         }
         original.call(key, held);
     }

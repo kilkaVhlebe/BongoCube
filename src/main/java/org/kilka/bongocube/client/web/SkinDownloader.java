@@ -14,12 +14,8 @@ import java.nio.file.Path;
 
 public class SkinDownloader {
 
-    public static NativeImage downloadSkin(String skinUrl, Path cachePath) throws IOException {
-        if (Files.isRegularFile(cachePath, new LinkOption[0])) {
-            try (InputStream is = Files.newInputStream(cachePath)) {
-                return NativeImage.read(is);
-            }
-        }
+    public static NativeImage downloadSkinToNativeImage(String skinUrl) throws IOException {
+
 
         HttpURLConnection connection = null;
         int maxRetries = 3;
@@ -41,14 +37,57 @@ public class SkinDownloader {
                 int responseCode = connection.getResponseCode();
                 if (responseCode == 200) {
                     byte[] data = connection.getInputStream().readAllBytes();
-
-                    try {
-                        Files.createDirectories(cachePath.getParent());
-                        Files.write(cachePath, data);
-                    } catch (IOException e) {
-                    }
-
                     return NativeImage.read(new ByteArrayInputStream(data));
+                }
+
+                currentTry++;
+                Thread.sleep(1000);
+
+            } catch (IOException e) {
+                lastException = e;
+                currentTry++;
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw new IOException("Download interrupted", e);
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new IOException("Download interrupted");
+            } finally {
+                if (connection != null) {
+                    connection.disconnect();
+                }
+            }
+        }
+
+        throw new IOException("Failed to download skin after " + maxRetries + " attempts", lastException);
+    }
+
+    public static byte[] downloadSkinToByteArray(String skinUrl) throws IOException {
+
+
+        HttpURLConnection connection = null;
+        int maxRetries = 3;
+        int currentTry = 0;
+        IOException lastException = null;
+
+        while (currentTry < maxRetries) {
+            try {
+                connection = (HttpURLConnection) URI.create(skinUrl)
+                        .toURL()
+                        .openConnection(Minecraft.getInstance().getProxy());
+
+                connection.setRequestProperty("User-Agent", "Mozilla/5.0 Minecraft Client");
+                connection.setConnectTimeout(15000);
+                connection.setReadTimeout(15000);
+                connection.setDoInput(true);
+                connection.connect();
+
+                int responseCode = connection.getResponseCode();
+                if (responseCode == 200) {
+                    return connection.getInputStream().readAllBytes();
                 }
 
                 currentTry++;

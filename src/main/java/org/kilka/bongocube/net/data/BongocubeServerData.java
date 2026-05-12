@@ -3,7 +3,6 @@ package org.kilka.bongocube.net.data;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import net.minecraft.world.level.saveddata.SavedData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +18,8 @@ public class BongocubeServerData {
     private static final Gson GSON = new GsonBuilder()
             .setPrettyPrinting()
             .create();
+
+    boolean dirty = false;
 
     private static final Logger log = LoggerFactory.getLogger(BongocubeServerData.class);
 
@@ -91,13 +92,21 @@ public class BongocubeServerData {
     public void setPlayerClicks(String uuid, String playerName, long clicks) {
         players.computeIfAbsent(uuid, k -> new PlayerStats(playerName, 0));
         players.get(uuid).clicks = clicks;
+        dirty = true;
     }
 
     public long getPlayerClicks(String uuid) {
         return players.getOrDefault(uuid, new PlayerStats()).clicks;
     }
 
-    public class PlayerStats {
+    public void saveIfDirty(Path dir, String file) {
+        if (dirty) {
+            save(dir, file);
+            dirty = false;
+        }
+    }
+
+    public static class PlayerStats {
         public String playerName;
         public long clicks;
 
