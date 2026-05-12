@@ -1,6 +1,7 @@
 package org.kilka.bongocube.net;
 
 import net.fabricmc.api.EnvType;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -122,6 +123,11 @@ public class ModNetworking {
                 }
 
                 playersStatsData.players = payload.players();
+
+            });
+
+            ClientPlayConnectionEvents.DISCONNECT.register((handler,client) ->{
+                playersStatsData.players.clear();
 
             });
         }

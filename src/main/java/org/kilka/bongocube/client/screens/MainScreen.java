@@ -33,6 +33,11 @@ public class MainScreen extends Screen {
                 new ArrayList<>(Bongocube.playersStatsData.players.entrySet());
         sorted.sort((a, b) -> Long.compare(b.getValue().clicks, a.getValue().clicks));
         LinearLayout contentLayout = LinearLayout.vertical().spacing(0);
+
+        if (sorted.isEmpty()) {
+            contentLayout.addChild(new EmptyLabelWidget());
+        }
+
         int index = 1;
         for (Map.Entry<String, BongocubeServerData.PlayerStats> entry : sorted) {
             String uuid = entry.getKey();
@@ -72,11 +77,26 @@ public class MainScreen extends Screen {
         }
         @Override
         protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-            Identifier drawSkinId = skinId != null ? skinId : DefaultPlayerSkin.getDefaultTexture();
-            graphics.drawString(font, String.valueOf(rank), getX() + 10, getY() + 5, 0xFFFFFFFF, false);
-            PlayerFaceRenderer.draw(graphics, drawSkinId, getX() + 60, getY() + 5, 8, false, false, 0xFFFFFFFF);
-            graphics.drawString(font, stats.playerName, getX() + 80, getY() + 5, 0xFFFFFFFF, false);
-            graphics.drawString(font, String.valueOf(stats.clicks), getX() + 260, getY() + 5, 0xFFFFFFFF, false);
+                Identifier drawSkinId = skinId != null ? skinId : DefaultPlayerSkin.getDefaultTexture();
+                graphics.drawString(font, String.valueOf(rank), getX() + 10, getY() + 5, 0xFFFFFFFF, false);
+                PlayerFaceRenderer.draw(graphics, drawSkinId, getX() + 60, getY() + 5, 8, false, false, 0xFFFFFFFF);
+                graphics.drawString(font, stats.playerName, getX() + 80, getY() + 5, 0xFFFFFFFF, false);
+                graphics.drawString(font, String.valueOf(stats.clicks), getX() + 260, getY() + 5, 0xFFFFFFFF, false);
+        }
+        @Override
+        protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
+        }
+    }
+
+    private class EmptyLabelWidget extends AbstractWidget {
+        public EmptyLabelWidget() {
+            super(0, 0, 300, ITEM_HEIGHT, Component.empty());
+        }
+
+        @Override
+        protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+            graphics.drawString(font, ":(", getX() + 10, getY() + 5, 0xFFFFFFFF, false);
+
         }
         @Override
         protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {

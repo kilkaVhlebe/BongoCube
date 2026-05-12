@@ -14,7 +14,7 @@ import org.lwjgl.glfw.GLFW;
 public class KeysMaps {
 
     private static KeyMapping.Category CATEGORY = KeyMapping.Category.register(
-            Identifier.fromNamespaceAndPath(Bongocube.MOD_ID, "screens")
+            Identifier.fromNamespaceAndPath(Bongocube.MOD_ID, "bongocube")
     );
 
     public static KeyMapping openCustomScreen = KeyBindingHelper.registerKeyBinding(
