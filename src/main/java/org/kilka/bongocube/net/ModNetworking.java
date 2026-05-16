@@ -8,9 +8,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import org.jspecify.annotations.Nullable;
 import org.kilka.bongocube.Bongocube;
@@ -113,7 +111,6 @@ public class ModNetworking {
            });
         });
 
-
         if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
             ClientPlayNetworking.registerGlobalReceiver(PlayersDataPayload.TYPE, (payload, context) -> {
                 ClientLevel level = context.client().level;
@@ -126,9 +123,8 @@ public class ModNetworking {
 
             });
 
-            ClientPlayConnectionEvents.DISCONNECT.register((handler,client) ->{
+            ClientPlayConnectionEvents.DISCONNECT.register((handler,client) -> {
                 playersStatsData.players.clear();
-
             });
         }
     }

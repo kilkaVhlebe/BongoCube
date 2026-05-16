@@ -45,7 +45,7 @@ public class ChibiRenderer {
 
         Identifier chibiId = getCurrentChibiId();
         if (chibiId == null) {
-            chibiId = Identifier.fromNamespaceAndPath(Bongocube.MOD_ID, "textures/gui/bongocube_chibi.png");
+            chibiId = Identifier.fromNamespaceAndPath(Bongocube.MOD_ID, "textures/gui/bongocube_chibi_v2.png");
         }
 
         int[] position = calculatePosition();

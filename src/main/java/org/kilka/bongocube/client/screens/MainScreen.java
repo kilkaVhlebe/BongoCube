@@ -11,6 +11,8 @@ import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import org.kilka.bongocube.Bongocube;
+import org.kilka.bongocube.client.screens.widgets.LabelWidget;
+import org.kilka.bongocube.client.screens.widgets.PlayerRowWidget;
 import org.kilka.bongocube.client.utils.SkinChache;
 import org.kilka.bongocube.net.data.BongocubeServerData;
 import org.slf4j.Logger;
@@ -21,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 public class MainScreen extends Screen {
     private static final Logger log = LoggerFactory.getLogger(MainScreen.class);
-    private static final int ITEM_HEIGHT = 20;
+    public static final int ITEM_HEIGHT = 20;
     private ScrollableLayout scrollableLayout;
     public MainScreen(Component title) {
         super(title);
@@ -35,7 +37,7 @@ public class MainScreen extends Screen {
         LinearLayout contentLayout = LinearLayout.vertical().spacing(0);
 
         if (sorted.isEmpty()) {
-            contentLayout.addChild(new EmptyLabelWidget());
+            contentLayout.addChild(new LabelWidget(":(", this.font));
         }
 
         int index = 1;
@@ -62,44 +64,5 @@ public class MainScreen extends Screen {
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
         super.render(graphics, mouseX, mouseY, delta);
-    }
-    private class PlayerRowWidget extends AbstractWidget {
-        private final BongocubeServerData.PlayerStats stats;
-        private final String uuid;
-        private final int rank;
-        private final Identifier skinId;
-        public PlayerRowWidget(int rank, BongocubeServerData.PlayerStats stats, String uuid, net.minecraft.client.gui.Font font) {
-            super(0, 0, 300, ITEM_HEIGHT, Component.empty());
-            this.rank = rank;
-            this.stats = stats;
-            this.uuid = uuid;
-            this.skinId = SkinChache.get(uuid);
-        }
-        @Override
-        protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-                Identifier drawSkinId = skinId != null ? skinId : DefaultPlayerSkin.getDefaultTexture();
-                graphics.drawString(font, String.valueOf(rank), getX() + 10, getY() + 5, 0xFFFFFFFF, false);
-                PlayerFaceRenderer.draw(graphics, drawSkinId, getX() + 60, getY() + 5, 8, false, false, 0xFFFFFFFF);
-                graphics.drawString(font, stats.playerName, getX() + 80, getY() + 5, 0xFFFFFFFF, false);
-                graphics.drawString(font, String.valueOf(stats.clicks), getX() + 260, getY() + 5, 0xFFFFFFFF, false);
-        }
-        @Override
-        protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-        }
-    }
-
-    private class EmptyLabelWidget extends AbstractWidget {
-        public EmptyLabelWidget() {
-            super(0, 0, 300, ITEM_HEIGHT, Component.empty());
-        }
-
-        @Override
-        protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-            graphics.drawString(font, ":(", getX() + 10, getY() + 5, 0xFFFFFFFF, false);
-
-        }
-        @Override
-        protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-        }
     }
 }
