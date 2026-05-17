@@ -71,7 +71,7 @@ public class BongocubeClient implements ClientModInitializer {
             levelName = minecraft.getSingleplayerServer().getWorldData().getLevelName();
         } else {
             ServerData server = minecraft.getCurrentServer();
-            levelName = server != null ? server.ip : "unknown";
+            levelName = server != null ? server.ip.replace(":","_") : "unknown";
         }
         return levelName + ".json";
     }
