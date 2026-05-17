@@ -37,8 +37,8 @@ public class ModNetworking {
     public static BongocubeServerData bongocubeServerData = null;
 
     public static void init() {
-        PayloadTypeRegistry.playC2S().register(ClicksDataPayload.TYPE, ClicksDataPayload.STREAM_CODEC);
-        PayloadTypeRegistry.playS2C().register(PlayersDataPayload.TYPE, PlayersDataPayload.STREAM_CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(ClicksDataPayload.TYPE, ClicksDataPayload.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(PlayersDataPayload.TYPE, PlayersDataPayload.STREAM_CODEC);
 
         ServerLifecycleEvents.SERVER_STARTED.register(server -> {
 

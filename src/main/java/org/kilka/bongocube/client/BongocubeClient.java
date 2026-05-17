@@ -7,7 +7,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.Nullable;
@@ -30,7 +30,6 @@ public class BongocubeClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         Config.initialize();
-        ChibiRenderer.initialize();
 
         KeysMaps.registerMappings();
 
@@ -39,6 +38,8 @@ public class BongocubeClient implements ClientModInitializer {
         if (schema.load(modDir)) {
             LOGGER.info("[BongocubeClient] Chibi schema loaded from PNG files");
         }
+
+        ChibiRenderer.initialize();
 
         ClientPlayConnectionEvents.JOIN.register((listener, sender, minecraft) -> {
             bongocubeData = BongocubeData.loadOrCreate(
@@ -75,14 +76,14 @@ public class BongocubeClient implements ClientModInitializer {
         return levelName + ".json";
     }
 
-    private static void render(GuiGraphics graphics, DeltaTracker tickCounter) {
+    private static void render(GuiGraphicsExtractor graphics, DeltaTracker tickCounter) {
         ChibiRenderer.render(graphics, tickCounter);
 
         if (bongocubeData != null && Config.get().renderCounter) {
             int[] position = ChibiRenderer.calculatePosition();
             int x = position[0];
             int y = position[1];
-            graphics.drawString(
+            graphics.text(
                     Minecraft.getInstance().font,
                     String.valueOf(bongocubeData.clicks),
                     x + 5,

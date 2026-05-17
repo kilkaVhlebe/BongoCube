@@ -13,8 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.Mixin;
 
-import static org.kilka.bongocube.Bongocube.playersStatsData;
-
 @Mixin(KeyMapping.class)
 public class KeyMappingMixin {
 

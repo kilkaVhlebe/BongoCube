@@ -4,7 +4,7 @@ import com.mojang.blaze3d.platform.NativeImage;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
@@ -35,7 +35,7 @@ public class ChibiRenderer {
         TextureUtils.initialize();
     }
 
-    public static Identifier render(GuiGraphics graphics, DeltaTracker tickCounter) {
+    public static Identifier render(GuiGraphicsExtractor graphics, DeltaTracker tickCounter) {
         if (!Config.get().renderChibi) {
             return null;
         }
@@ -208,30 +208,37 @@ public class ChibiRenderer {
         skinCache.clear();
 
         try {
-            var files = Files.list(skinsDir).toList();
-            for (var file : files) {
-                String name = file.getFileName().toString();
-                if (name.endsWith("_original.png")) {
-                    String playerName = name.replace("_original.png", "");
-                    String safeName = sanitizeFileName(playerName);
+            var playerDirs = Files.list(skinsDir).filter(Files::isDirectory).toList();
 
-                    LOGGER.info("[ChibiRenderer] Rebuilding: {}", playerName);
+            for (var playerDir : playerDirs) {
+                String playerName = playerDir.getFileName().toString();
+                String safeName = sanitizeFileName(playerName);
 
-                    NativeImage skinImage = TextureUtils.parseImageFile(file);
-                    if (skinImage == null) {
-                        continue;
-                    }
+                Path originalSkinPath = playerDir.resolve(safeName.toLowerCase(java.util.Locale.ROOT) + "_original.png");
 
-                    boolean useSchema = Config.get().useChibiSchema;
-                    NativeImage chibiImage = useSchema ? TextureUtils.createChibiFromSkin(skinImage) : TextureUtils.createDefaultChibiOnly(skinImage);
-                    skinImage.close();
+                if (!Files.exists(originalSkinPath)) {
+                    continue;
+                }
 
-                    if (chibiImage != null) {
-                        String chibiFileName = safeName.toLowerCase(java.util.Locale.ROOT) + (useSchema ? "_chibi.png" : "_chibi_default.png");
-                        Path chibiPath = skinsDir.resolve(chibiFileName);
-                        TextureUtils.saveChibiImage(chibiImage, chibiPath);
-                        chibiImage.close();
-                    }
+                LOGGER.info("[ChibiRenderer] Rebuilding: {}", playerName);
+                NativeImage skinImage = TextureUtils.parseImageFile(originalSkinPath);
+                if (skinImage == null) {
+                    continue;
+                }
+                boolean useSchema = Config.get().useChibiSchema;
+                NativeImage chibiImage = useSchema ? TextureUtils.createChibiFromSkin(skinImage) : TextureUtils.createDefaultChibiOnly(skinImage);
+                skinImage.close();
+                if (chibiImage != null) {
+                    String suffix = useSchema ? "_chibi.png" : "_chibi_default.png";
+                    Path chibiPath = playerDir.resolve(safeName.toLowerCase(java.util.Locale.ROOT) + suffix);
+
+                    String oldSuffix = useSchema ? "_chibi_default.png" : "_chibi.png";
+                    Path oldPath = playerDir.resolve(safeName.toLowerCase(java.util.Locale.ROOT) + oldSuffix);
+                    Files.deleteIfExists(oldPath);
+
+                    TextureUtils.saveChibiImage(chibiImage, chibiPath);
+                    chibiImage.close();
+                    LOGGER.info("[ChibiRenderer] Rebuilt chibi for: {}", playerName);
                 }
             }
             LOGGER.info("[ChibiRenderer] Rebuild complete");
