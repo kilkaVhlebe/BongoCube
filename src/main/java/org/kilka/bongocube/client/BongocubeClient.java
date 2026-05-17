@@ -30,7 +30,6 @@ public class BongocubeClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         Config.initialize();
-        ChibiRenderer.initialize();
 
         KeysMaps.registerMappings();
 
@@ -39,6 +38,8 @@ public class BongocubeClient implements ClientModInitializer {
         if (schema.load(modDir)) {
             LOGGER.info("[BongocubeClient] Chibi schema loaded from PNG files");
         }
+
+        ChibiRenderer.initialize();
 
         ClientPlayConnectionEvents.JOIN.register((listener, sender, minecraft) -> {
             bongocubeData = BongocubeData.loadOrCreate(
